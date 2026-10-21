@@ -53,6 +53,71 @@ async function controllaAggiornamenti() {
   }
 }
 
+// --- SISTEMA DI INTERCETTAZIONE CONSOLE PER MOBILE ---
+function inizializzaConsoleMobile() {
+  const contenitoreLogs = document.getElementById('contenitore-logs');
+
+  // Salviamo le funzioni originali del browser per non perderle
+  const originalLog = console.log;
+  const originalWarn = console.warn;
+  const originalError = console.error;
+
+  function scriviLogSuSchermo(tipo, args) {
+    if (!contenitoreLogs) return;
+
+    const ora = new Date().toLocaleTimeString();
+    
+    // Convertiamo gli argomenti in testo (anche se passi Oggetti o Errori!)
+    const messaggio = Array.from(args).map(arg => {
+      if (arg instanceof Error) return `${arg.message}\n${arg.stack}`;
+      if (typeof arg === 'object') {
+        try { return JSON.stringify(arg, null, 2); } catch (e) { return String(arg); }
+      }
+      return String(arg);
+    }).join(' ');
+
+    // Scegliamo il colore in base alla gravità
+    let colore = '#4ec9b0'; // Verde acqua per i normali console.log
+    if (tipo === 'WARN') colore = '#dcdcaa'; // Giallo per i warning
+    if (tipo === 'ERROR') colore = '#f44747'; // Rosso acceso per gli errori
+
+    const riga = document.createElement('div');
+    riga.style.borderBottom = '1px solid #333';
+    riga.style.padding = '6px 0';
+    riga.style.color = colore;
+    riga.innerHTML = `<small style="color: #888;">[${ora}] [${tipo}]</small><br><pre style="margin: 2px 0; white-space: pre-wrap; font-family: inherit;">${messaggio}</pre>`;
+
+    contenitoreLogs.appendChild(riga);
+    // Scorri automaticamente verso il basso all'ultimo messaggio
+    contenitoreLogs.scrollTop = contenitoreLogs.scrollHeight;
+  }
+
+  // Sovrascriviamo console.log, warn ed error
+  console.log = function (...args) {
+    originalLog.apply(console, args);
+    scriviLogSuSchermo('INFO', args);
+  };
+
+  console.warn = function (...args) {
+    originalWarn.apply(console, args);
+    scriviLogSuSchermo('WARN', args);
+  };
+
+  console.error = function (...args) {
+    originalError.apply(console, args);
+    scriviLogSuSchermo('ERROR', args);
+  };
+
+  // Intercettiamo anche eventuali errori critici JS non gestiti o Promise fallite!
+  window.addEventListener('error', (event) => {
+    scriviLogSuSchermo('ERROR', [`Errore Globale: ${event.message} (${event.filename}:${event.lineno})`]);
+  });
+
+  window.addEventListener('unhandledrejection', (event) => {
+    scriviLogSuSchermo('ERROR', [`Promise fallita:`, event.reason]);
+  });
+}
+
 // Variabile globale per mantenere il riferimento al database aperto
 let db;
 
@@ -154,6 +219,10 @@ async function chiamaApiEsterna() {
 
 // --- AVVIO DELL'APPLICAZIONE E GESTIONE EVENTI ---
 window.addEventListener("DOMContentLoaded", async () => {
+    // 0. ATTIVA SUBITO LA CONSOLE SU SCHERMO!
+  inizializzaConsoleMobile();
+  console.log('App avviata! Piattaforma:', Capacitor.getPlatform());
+
   // 1. Avvia SQLite
   try {
     await initDatabase();
@@ -164,18 +233,32 @@ window.addEventListener("DOMContentLoaded", async () => {
   // 2. Gestione click nel Menu Laterale per cambiare schermata
   const sezioneDb = document.getElementById("sezione-db");
   const sezioneApi = document.getElementById("sezione-api");
+  const sezioneLogs = document.getElementById('sezione-logs');
   const pageTitle = document.getElementById("page-title");
 
-  document.getElementById("menu-db").addEventListener("click", () => {
-    sezioneDb.style.display = "block";
-    sezioneApi.style.display = "none";
-    pageTitle.innerText = "Database SQLite";
+   document.getElementById('menu-db').addEventListener('click', () => {
+    sezioneDb.style.display = 'block';
+    sezioneApi.style.display = 'none';
+    sezioneLogs.style.display = 'none';
+    pageTitle.innerText = 'Database SQLite';
   });
 
-  document.getElementById("menu-api").addEventListener("click", () => {
-    sezioneDb.style.display = "none";
-    sezioneApi.style.display = "block";
-    pageTitle.innerText = "Chiamata API (AJAX)";
+  document.getElementById('menu-api').addEventListener('click', () => {
+    sezioneDb.style.display = 'none';
+    sezioneApi.style.display = 'block';
+    sezioneLogs.style.display = 'none';
+    pageTitle.innerText = 'Chiamata API (AJAX)';
+  });
+
+  document.getElementById('menu-logs').addEventListener('click', () => {
+    sezioneDb.style.display = 'none';
+    sezioneApi.style.display = 'none';
+    sezioneLogs.style.display = 'block';
+    pageTitle.innerText = 'Console di Debug';
+  });
+
+  document.getElementById('btn-pulisci-logs').addEventListener('click', () => {
+    document.getElementById('contenitore-logs').innerHTML = '';
   });
 
   document.getElementById("menu-update").addEventListener("click", async () => {

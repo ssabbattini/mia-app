@@ -27,6 +27,9 @@
               <ion-item button id="menu-update">
                 <ion-label>Controlla aggiornamenti</ion-label>
               </ion-item>
+              <ion-item button id="menu-logs">
+                <ion-label>🐞 Console di Debug</ion-label>
+              </ion-item>
             </ion-menu-toggle>
           </ion-list>
         </ion-content>
@@ -73,6 +76,27 @@
             <ion-list id="lista-post-api" class="ion-margin-top">
               <!-- Qui verranno inseriti i dati scaricati via AJAX -->
             </ion-list>
+          </div>
+
+          <!-- SEZIONE C: CONSOLE DI DEBUG (Nascosta all'avvio) -->
+          <div id="sezione-logs" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <h2>Log di Sistema</h2>
+              <ion-button id="btn-pulisci-logs" color="medium" size="small">Pulisci</ion-button>
+            </div>
+            
+            <!-- Riquadro stile terminale dove finiranno tutti i console.log / error -->
+            <div id="contenitore-logs" style="
+              background: #1e1e1e; 
+              color: #d4d4d4; 
+              font-family: monospace; 
+              font-size: 12px; 
+              padding: 10px; 
+              border-radius: 8px; 
+              height: 70vh; 
+              overflow-y: auto;
+              word-wrap: break-word;">
+            </div>
           </div>
 
         </ion-content>
