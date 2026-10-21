@@ -1,5 +1,10 @@
 {
   "appId": "it.bsdsoftware.app",
   "appName": "Mia App",
-  "webDir": "dist"
+  "webDir": "dist",
+  "plugins": {
+    "CapacitorUpdater": {
+      "autoUpdate": false
+    }
+  }
 }
