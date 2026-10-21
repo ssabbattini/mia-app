@@ -8,6 +8,38 @@ import { Capacitor } from '@capacitor/core';
 import { CapacitorSQLite, SQLiteConnection } from '@capacitor-community/sqlite';
 import { defineCustomElements as defineJeepSqlite } from 'jeep-sqlite/loader';
 
+import { CapacitorUpdater } from '@capgo/capacitor-updater';
+
+// Diciamo al plugin che l'app attuale è partita correttamente (evita il rollback di sicurezza)
+CapacitorUpdater.notifyAppReady();
+
+async function controllaAggiornamenti() {
+  try {
+    // 1. Chiami un tuo indirizzo web per vedere qual è l'ultima versione
+    const res = await fetch('https://abaco.eber.org/versione.json');
+    const datiServer = await res.json(); 
+    // Immaginiamo che versione.json contenga: { "version": "1.0.2", "url": "https://tuosito.it/app/dist.zip" }
+
+    const versioneAttuale = localStorage.getItem('versione_app') || '1.0.0';
+
+    if (datiServer.version !== versioneAttuale) {
+      console.log('Nuovo aggiornamento trovato! Scaricamento in corso...');
+      
+      // 2. Il plugin scarica lo ZIP e lo prepara nella memoria del telefono
+      const nuovaVersione = await CapacitorUpdater.download({
+        url: datiServer.url,
+        version: datiServer.version,
+      });
+
+      // 3. Salviamo il numero di versione e applichiamo subito l'aggiornamento!
+      localStorage.setItem('versione_app', datiServer.version);
+      await CapacitorUpdater.set(nuovaVersione); // Ricarica l'app istantaneamente con il nuovo codice!
+    }
+  } catch (err) {
+    console.log('Nessun aggiornamento o telefono offline:', err);
+  }
+}
+
 // Variabile globale per mantenere il riferimento al database aperto
 let db;
 
@@ -128,6 +160,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     sezioneDb.style.display = 'none';
     sezioneApi.style.display = 'block';
     pageTitle.innerText = 'Chiamata API (AJAX)';
+  });
+
+  document.getElementById('menu-update').addEventListener('click', async () => {
+    await controllaAggiornamenti();
   });
 
   // 3. Gestione bottone "Salva nel Database"

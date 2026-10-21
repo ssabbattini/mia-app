@@ -17,6 +17,7 @@
     "@capacitor/android": "^8.5.3",
     "@capacitor/core": "^8.5.3",
     "@capacitor/ios": "^8.5.3",
+    "@capgo/capacitor-updater": "^8.53.1",
     "@ionic/core": "^9.0.8",
     "jeep-sqlite": "^2.8.0",
     "localforage": "^1.10.0",
