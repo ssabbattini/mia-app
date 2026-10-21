@@ -40,6 +40,7 @@ async function controllaAggiornamenti() {
       const nuovaVersione = await CapacitorUpdater.download({
         url: datiServer.url,
         version: datiServer.version,
+        checksum: datiServer.checksum
       });
 
       // 4. Salva la versione e riavvia l'app con i nuovi file
