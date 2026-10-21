@@ -1,0 +1,42 @@
+name: Build Mobile App
+
+on:
+  push:
+    branches: [ "main" ] # Parte in automatico ogni volta che fai push sul branch main
+  workflow_dispatch:     # Ti permette di avviarlo anche manualmente da GitHub
+
+jobs:
+  # --- LAVORO 1: COMPILAZIONE ANDROID ---
+  build-android:
+    name: Build Android APK
+    runs-on: ubuntu-latest # Usa un server Linux di GitHub
+    steps:
+      - name: Scarica il codice
+        uses: actions/checkout@v4
+
+      - name: Installa Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Installa Java (Richiesto per Android)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Installa dipendenze e compila Web App
+        run: |
+          npm install
+          npm run build
+          npx cap sync android
+
+      - name: Compila APK di Debug
+        working-directory: ./android
+        run: ./gradlew assembleDebug
+
+      - name: Salva l'APK generato
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
