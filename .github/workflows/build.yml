@@ -1,29 +1,29 @@
-name: Build Mobile App
+name: Build Android App
 
 on:
   push:
-    branches: [ "main" ] # Parte in automatico ogni volta che fai push sul branch main
-  workflow_dispatch:     # Ti permette di avviarlo anche manualmente da GitHub
+    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
-  # --- LAVORO 1: COMPILAZIONE ANDROID ---
   build-android:
     name: Build Android APK
-    runs-on: ubuntu-latest # Usa un server Linux di GitHub
+    runs-on: ubuntu-latest
     steps:
       - name: Scarica il codice
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Installa Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: '24'
+          package-manager-cache: false
 
-      - name: Installa Java (Richiesto per Android)
-        uses: actions/setup-java@v4
+      - name: Installa Java 21 (Richiesto dalle nuove versioni di Capacitor)
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
 
       - name: Installa dipendenze e compila Web App
         run: |
@@ -31,12 +31,14 @@ jobs:
           npm run build
           npx cap sync android
 
-      - name: Compila APK di Debug
+      - name: Dai i permessi di esecuzione a Gradle e compila APK
         working-directory: ./android
-        run: ./gradlew assembleDebug
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
       - name: Salva l'APK generato
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: android-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
