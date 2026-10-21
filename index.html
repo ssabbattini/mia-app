@@ -2,24 +2,79 @@
 <html lang="it">
   <head>
     <meta charset="UTF-8" />
-    <!-- Meta tag fondamentale per il corretto ridimensionamento su mobile e gestione del "notch" -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Mia App</title>
+    <title>Mia App Completa</title>
   </head>
   <body>
-    <!-- Struttura base di un'app Ionic -->
     <ion-app>
-      <ion-header>
-        <ion-toolbar color="primary">
-          <ion-title>Mia App Vanilla</ion-title>
-        </ion-toolbar>
-      </ion-header>
       
-      <ion-content class="ion-padding">
-        <h1>Ciao Mondo!</h1>
-        <p>Questa è un'app in JS puro con Ionic e Vite.</p>
-        <ion-button id="mio-bottone" expand="block">Cliccami</ion-button>
-      </ion-content>
+      <!-- 1. PANNELLO LATERALE (MENU) -->
+      <ion-menu content-id="main-content">
+        <ion-header>
+          <ion-toolbar color="secondary">
+            <ion-title>Menu Principale</ion-title>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content>
+          <ion-list>
+            <ion-menu-toggle auto-hide="true">
+              <ion-item button id="menu-db">
+                <ion-label>📦 Database Locale (SQLite)</ion-label>
+              </ion-item>
+              <ion-item button id="menu-api">
+                <ion-label>🌐 Chiamata API (AJAX)</ion-label>
+              </ion-item>
+            </ion-menu-toggle>
+          </ion-list>
+        </ion-content>
+      </ion-menu>
+
+      <!-- 2. CONTENUTO PRINCIPALE (collegato al menu tramite id="main-content") -->
+      <div class="ion-page" id="main-content">
+        <ion-header>
+          <ion-toolbar color="primary">
+            <!-- Bottone "Hamburger" per aprire il menu -->
+            <ion-buttons slot="start">
+              <ion-menu-button></ion-menu-button>
+            </ion-buttons>
+            <ion-title id="page-title">Database SQLite</ion-title>
+          </ion-toolbar>
+        </ion-header>
+
+        <ion-content class="ion-padding">
+          
+          <!-- SEZIONE A: DATABASE SQLITE -->
+          <div id="sezione-db">
+            <h2>Gestione Utenti (SQLite)</h2>
+            <ion-item>
+              <ion-input id="input-nome" label="Nome Utente" label-placement="floating" placeholder="Inserisci un nome..."></ion-input>
+            </ion-item>
+            <ion-button id="btn-salva-db" expand="block" class="ion-margin-top">
+              Salva nel Database
+            </ion-button>
+
+            <h3 class="ion-margin-top">Utenti salvati nel DB:</h3>
+            <ion-list id="lista-utenti-db">
+              <!-- Qui verranno inseriti i dati letti da SQLite -->
+            </ion-list>
+          </div>
+
+          <!-- SEZIONE B: CHIAMATE AJAX / API (Nascosta all'avvio) -->
+          <div id="sezione-api" style="display: none;">
+            <h2>Dati da API Esterna</h2>
+            <p>Scarichiamo dati di test da JSONPlaceholder tramite Fetch AJAX.</p>
+            <ion-button id="btn-carica-api" expand="block" color="tertiary">
+              Scarica Post dal Server
+            </ion-button>
+
+            <ion-list id="lista-post-api" class="ion-margin-top">
+              <!-- Qui verranno inseriti i dati scaricati via AJAX -->
+            </ion-list>
+          </div>
+
+        </ion-content>
+      </div>
+
     </ion-app>
 
     <script type="module" src="/src/main.js"></script>

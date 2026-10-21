@@ -13,9 +13,13 @@
     "vite": "^8.3.4"
   },
   "dependencies": {
+    "@capacitor-community/sqlite": "^8.1.1",
     "@capacitor/android": "^8.5.3",
     "@capacitor/core": "^8.5.3",
     "@capacitor/ios": "^8.5.3",
-    "@ionic/core": "^9.0.8"
+    "@ionic/core": "^9.0.8",
+    "jeep-sqlite": "^2.8.0",
+    "localforage": "^1.10.0",
+    "sql.js": "^1.11.0"
   }
 }
